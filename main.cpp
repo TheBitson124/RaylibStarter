@@ -7,17 +7,20 @@
 #include <queue>
 
 using namespace std;
-void draw_gui(int selected_index);
+void draw_gui(int selected_index,deque<string> &output);
 
+void update_output_queue(deque<string> &output, string line);
 int main()
 {
 
     const int screenWidth = 1400;
     const int screenHeight = 1000;
+    deque<string> console_output(5);
+
     InitWindow(screenWidth, screenHeight, "GigantMony");
 
-    Poks player("Fire", "resources/fire.png");
-    Poks enemy("Water", "resources/water.png");
+    Poks player("Fire",20,10,5,Elements::Ogien, "resources/fire.png");
+    Poks enemy("Water",20,10,5,Elements::Woda, "resources/water.png");
 
     int selected_idx{};
 
@@ -37,7 +40,7 @@ int main()
 
         BeginDrawing();
         ClearBackground(SKYBLUE);
-        draw_gui(selected_idx);
+        draw_gui(selected_idx,console_output);
 
         player.render(screenWidth / 2 - 520, screenHeight / 2 - 220);
 
@@ -49,7 +52,7 @@ int main()
     return 0;
 }
 
-void draw_gui(int selected)
+void draw_gui(int selected,deque<string> &output)
 {
     Rectangle menu{-2, 810, 900, 310};
     DrawRectangleLinesEx(menu, 4, BLACK);
@@ -63,4 +66,16 @@ void draw_gui(int selected)
 
     Rectangle console{906, 810, 600, 310};
     DrawRectangleLinesEx(console, 4, BLACK);
+
+    int offset = 0;
+    for(string line : output){
+        DrawLine(line.c_str(),920, 920- 25*offset,20 ,BLACK);
+        offset++;
+    }
+}
+void update_output_queue(deque<string> &output, string line){
+    output.push_back(line);
+    if(output.size() > 5){
+        output.pop_front();
+    }
 }
