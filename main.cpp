@@ -37,7 +37,35 @@ int main()
             selected_idx++;
             selected_idx = selected_idx > 2 ? 0 : selected_idx;
         }
-
+        else if(IsKeyPressed(KEY_ENTER)){
+            string text{};
+            switch(selected_idx){
+                case 0:{
+                    bool target_dead = player.attack(enemy,text);
+                    update_output_queue(console_output,text);
+                    if(target_dead){
+                        update_output_queue(console_output,enemy.get_name() + " has died ");
+                    }
+                    break;
+                }
+                case 1:{
+                    player.defend(text);
+                    update_output_queue(console_output,text);
+                    break;
+                }
+                case 2:{
+                    player.special(enemy,text);
+                    update_output_queue(console_output,text);
+                    break;
+                }
+                default: break;
+            }
+            bool target_dead = enemy.attack(player,text);
+            if(target_dead){
+                update_output_queue(console_output,player.get_name() + " has died ");
+            }
+            update_output_queue(console_output,text);
+        }
         BeginDrawing();
         ClearBackground(SKYBLUE);
         draw_gui(selected_idx,console_output);
@@ -69,7 +97,7 @@ void draw_gui(int selected,deque<string> &output)
 
     int offset = 0;
     for(string line : output){
-        DrawLine(line.c_str(),920, 920- 25*offset,20 ,BLACK);
+        DrawText(line.c_str(),920, 920- 25*offset,20 ,BLACK);
         offset++;
     }
 }

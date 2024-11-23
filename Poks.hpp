@@ -44,8 +44,10 @@ class Poks
             this->_hp = this->_base_hp;
             this->_ad = this->_base_ad;
         }
-
-        void attack(Poks& target, string& out_string);
+        inline bool check_if_dead(){
+            return _hp <= 0;
+        }
+        bool attack(Poks& target, string& out_string);
         void defend(string& out_string);
         void special(Poks& target, string& out_string);
     private :
@@ -64,6 +66,7 @@ class Poks
         Elements _element;
 
         Texture2D _texture;
+        void draw_hp_bar(float x, float y);
 };
 
 const int TEXTURE_WIDTH = 350;
@@ -90,10 +93,15 @@ Poks::Poks(string name, int hp, int ad, int def,Elements el,const char *path)
 void Poks::render(float x, float y){
     DrawTexture(_texture,x,y,WHITE);
     DrawText(_name.c_str(), x + TEXTURE_WIDTH /2 - 30, y + TEXTURE_HEIGHT + 20, 30, BLACK);
+
+    DrawText(TextFormat("ATTACK %i",this->_ad),x - 140, y + TEXTURE_HEIGHT/2 -20,20,BLACK);
+    DrawText(TextFormat("DEFENCE %i",this->_def),x - 150, y + TEXTURE_HEIGHT/2 +20,20,BLACK);
+    draw_hp_bar(x,y);
 }
-void Poks::attack(Poks& target, string& out_string){
+bool Poks::attack(Poks& target, string& out_string){
     target.take_damage(_ad);
     out_string = this->get_name() + " attacked " + target.get_name()  + " for : " + to_string(_ad);
+    return target.check_if_dead();
 }
 void Poks::defend(string& out_string){
     _def += _base_def/2;
@@ -110,4 +118,16 @@ void Poks::special(Poks& target, string& out_string){
          out_string = this->get_name() + " used special already";
     }
 }
+void Poks::draw_hp_bar(float x,float y){
+    float const x_anchor = x + 10;
+    float const y_anchor = y - 50;
 
+    float const height = 40;
+    float const border_width = 2;
+    Rectangle border{x_anchor,y_anchor ,TEXTURE_WIDTH - 10,height};
+    DrawRectangleLinesEx(border,border_width,BLACK);
+
+    const float fill = (float)_hp/(float)_base_hp;
+
+    DrawRectangle(x_anchor + border_width,y_anchor + border_width, fill * (TEXTURE_WIDTH - 10 -2 *border_width),height - 2*border_width, GREEN);
+}
